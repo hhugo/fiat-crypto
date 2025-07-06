@@ -29,9 +29,9 @@ WASM_OF_OCAML ?= wasm_of_ocaml
 STANDALONE_CAMLFLAGS ?= -package unix -w -20 -g $(CAMLEXTRAFLAGS)
 STANDALONE_JS_CAMLFLAGS ?= -package js_of_ocaml $(STANDALONE_CAMLFLAGS)
 JS_OF_OCAML_EXTRAFLAGS ?=
-JS_OF_OCAML_FLAGS ?= --source-map --no-inline --enable=effects $(JS_OF_OCAML_EXTRAFLAGS)
+JS_OF_OCAML_FLAGS ?= --source-map --enable=effects $(JS_OF_OCAML_EXTRAFLAGS)
 WASM_OF_OCAML_EXTRAFLAGS ?=
-WASM_OF_OCAML_FLAGS ?= --source-map --no-inline $(WASM_OF_OCAML_EXTRAFLAGS)
+WASM_OF_OCAML_FLAGS ?= --source-map $(WASM_OF_OCAML_EXTRAFLAGS)
 
 PACKAGE ?= standalone.tar.gz
 PACKAGE_CMD ?= tar -czvf
@@ -92,9 +92,9 @@ $(STANDALONE_JS_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wasm) : %.wasm : %.byte
 	$(HIDE)$(ENSURE_STACK_LIMIT); \
 	 $(TIMER) $(WASM_OF_OCAML) $(WASM_OF_OCAML_FLAGS) $<
 
-$(STANDALONE_JS_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wat.gz) : %.wat.gz : %.wasm
+$(STANDALONE_JS_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wasm.gz) : %.wasm.gz : %.wasm
 	$(SHOW)'GZIP $*'
-	$(HIDE)$(TIMER) $(GZIP) $(GZIP_KEEP_FLAGS) $*.wat
+	$(HIDE)$(TIMER) $(GZIP) $(GZIP_KEEP_FLAGS) $*.wasm
 
 $(STANDALONE_HASKELL:%=src/ExtractionHaskell/%) : % : %.hs
 	$(SHOW)'GHC $< -o $@'
@@ -112,7 +112,7 @@ standalone-haskell: standalone-unified-haskell standalone-separate-haskell
 standalone-unified-haskell: $(UNIFIED_STANDALONE_HASKELL:%=src/ExtractionHaskell/%)
 standalone-separate-haskell: $(SEPARATE_STANDALONE_HASKELL:%=src/ExtractionHaskell/%)
 standalone-js-of-ocaml: $(STANDALONE_JS_OF_OCAML:%=src/ExtractionJsOfOCaml/%.js)
-standalone-wasm-of-ocaml: $(STANDALONE_WASM_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wasm) $(STANDALONE_WASM_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wat.gz)
+standalone-wasm-of-ocaml: $(STANDALONE_WASM_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wasm) $(STANDALONE_WASM_OF_OCAML:%=src/ExtractionJsOfOCaml/%.wasm.gz)
 
 uninstall-standalone-ocaml:: FILESTOINSTALL=$(OCAML_BINARIES)
 uninstall-standalone-unified-ocaml:: FILESTOINSTALL=$(UNIFIED_OCAML_BINARIES)
